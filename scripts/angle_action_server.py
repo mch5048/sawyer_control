@@ -4,9 +4,6 @@ import intera_interface as ii
 from sawyer_control.srv import angle_action
 from sawyer_control.srv import *
 import numpy as np
-
-
-
 import rospy
 from sensor_msgs.msg import JointState
 from std_msgs.msg import Float32

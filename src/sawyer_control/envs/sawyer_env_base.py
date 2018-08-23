@@ -12,6 +12,7 @@ from sawyer_control.srv import ik
 from sawyer_control.srv import angle_action
 from sawyer_control.srv import image
 from sawyer_control.msg import actions
+from sawyer_control.srv import ar_tag
 import abc
 
 class SawyerEnvBase(gym.Env, Serializable, MultitaskEnv, metaclass=abc.ABCMeta):
@@ -324,7 +325,13 @@ class SawyerEnvBase(gym.Env, Serializable, MultitaskEnv, metaclass=abc.ABCMeta):
     def send_angle_action(self, action):
 
         self.request_angle_action(action)
-
+    def _get_ar_pos(self):
+        left_marker_pose, right_marker_pose, middle_marker_pose = self.request_ar_tag()
+        return dict(
+            left_marker_pose=left_marker_pose,
+            right_marker_pose=right_marker_pose,
+            middle_marker_pose=middle_marker_pose,
+        )
     def request_image(self):
         rospy.wait_for_service('images')
         try:
@@ -376,6 +383,20 @@ class SawyerEnvBase(gym.Env, Serializable, MultitaskEnv, metaclass=abc.ABCMeta):
             image = image.flatten()
 
         return image
+
+    def request_ar_tag(self):
+        rospy.wait_for_service('ar_tag')
+        try:
+            request = rospy.ServiceProxy('ar_tag', ar_tag, persistent=True)
+            tag = request()
+            return (
+                np.array(tag.left_marker_pose),
+                np.array(tag.right_marker_pose),
+                np.array(tag.middle_marker_pose)
+            )
+        except rospy.ServiceException as e:
+            print(e)
+
 
     def request_observation(self):
         rospy.wait_for_service('observations')
