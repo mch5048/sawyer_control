@@ -61,6 +61,7 @@ catkin_python_setup()
    ik.srv
    image.srv
    angle_action.srv
+   ar_tag.srv
  )
 
 ## Generate actions in the 'action' folder
